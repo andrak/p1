@@ -1,4 +1,5 @@
 import sys
+import copy
 from collections import deque
 
 class Process:
@@ -136,6 +137,16 @@ def FCFS(fileInput):
 		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
 			print("time {}ms: Simulator ended for FCFS".format(count))
 			break
+	return
+'''
+def sorter(queue):
+	bursts = []
+	sortedQ = []
+	for i in queue:
+		bursts.append(i.burstTime)
+	sortedBursts = sorted(bursts)
+	for i in queue:
+		if'''
 
 def SJF(fileInput):
 	sort = sortInput(fileInput)
@@ -239,6 +250,7 @@ def SJF(fileInput):
 		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
 			print("time {}ms: Simulator ended for SJF".format(count))
 			break
+	return
 
 def RR(fileInput):
 	sort = sortInput(fileInput)
@@ -342,6 +354,7 @@ def RR(fileInput):
 		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
 			print("time {}ms: Simulator ended for RR".format(count))
 			break
+	return
 
 def main(argv):
 	file = open(argv[0])
@@ -359,11 +372,13 @@ def main(argv):
 			except ValueError:
 				continue
 		formattedInput.append(Process(temp))
-	#FCFS(formattedInput)
+	f2 = copy.deepcopy(formattedInput)
+	f3 = copy.deepcopy(formattedInput)
+	FCFS(formattedInput)
 	print('')
 	#sjf(formattedInput)
 	#print('\n')
-	RR(formattedInput)
+	RR(f3)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
