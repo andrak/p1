@@ -56,6 +56,7 @@ def RR(fileInput):
 					print("time {}ms: Process {} arrived {}".format(count, i.name, qPrint(queue,currentProcess.name)))
 				else:
 					print("time {}ms: Process {} arrived {}".format(count, i.name, qPrint(queue,'')))
+
 		if(len(queue) > 0):
 			currentProcess = queue[0]
 			left = currentProcess.remainingBurst % currentProcess.burstTime
@@ -76,8 +77,12 @@ def RR(fileInput):
 						cT = -4
 						cTBool = 0
 						processCount = 0
-						print("time {}ms: Process {} terminated {}"
-							.format(count, currentProcess.name, qPrint(queue, currentProcess.name)))				
+						if(len(queue) > 1):
+							print("time {}ms: Process {} terminated {}"
+								.format(count, currentProcess.name, qPrint(queue, currentProcess.name)))
+						else:
+							print("time {}ms: Process {} terminated {}"
+								.format(count, currentProcess.name, qPrint(queue, 'doIt')))
 						queue.popleft()
 					elif(processCount > 0 and left == 0):
 						cT = -4
@@ -90,11 +95,11 @@ def RR(fileInput):
 						currentProcess.ioFree = count + currentProcess.ioTime
 						print("time {}ms: Process {} blocked on I/O until time {}ms {}"
 							.format(count, currentProcess.name, currentProcess.ioFree, qPrint(queue,'')))
-					elif processCount < 84:
+					elif processCount < currentProcess.burstTime:
 						currentProcess.remainingBurst -=1
 						processCount += 1
 						cTBool = 1
-					elif(processCount == 84):
+					elif(processCount == currentProcess.burstTime):
 						cT = -4
 						cTBool = 0
 						processCount = 0
@@ -110,18 +115,27 @@ def RR(fileInput):
 							cTBool = 1
 							cT = 4
 							processCount = 0
+							continue
 						
 		count+=1
 		if not cTBool:
 			cT += 1
 		for i in blocked:
 			if(count == i.ioFree):
+				temp = i
 				blocked.remove(i)
-				queue.append(i)
-				print("time {}ms: Process {} completed I/O {}"
-					.format(count, i.name, qPrint(queue,currentProcess.name)))
+				if(len(queue) == 0):
+					cT = 0
+				queue.append(temp)
+				if(len(queue)==1):
+					print("time {}ms: Process {} completed I/O {}"
+					.format(count, i.name, qPrint(queue,'')))
+				else:
+					print("time {}ms: Process {} completed I/O {}"
+						.format(count, i.name, qPrint(queue,currentProcess.name)))
 				break
-		if(count > 1450):
+		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
+			print("time {}ms: Simulator ended for RR".format(count))
 			break
 
 def main(argv):
