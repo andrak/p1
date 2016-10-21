@@ -35,6 +35,211 @@ def sortInput(fileInput):
 			output[i.arrivalTime] = [i]
 	return (output, sorted(output))
 
+def FCFS(fileInput):
+	sort = sortInput(fileInput)
+	formattedDict = sort[0]
+	orderList = sort[1]
+	currentProcess = None
+	queue = deque()
+	blocked = deque()
+	count = 0
+	processCount = 0
+	cT = 0
+	cTBool = 0
+	print("time {}ms: Simulator started for FCFS {}".format(count, qPrint(queue,'')))
+
+	while(1):
+		if count in orderList:
+			for i in formattedDict[count]:
+				queue.append(i)
+				if(currentProcess):
+					print("time {}ms: Process {} arrived {}".format(count, i.name, qPrint(queue,currentProcess.name)))
+				else:
+					print("time {}ms: Process {} arrived {}".format(count, i.name, qPrint(queue,'')))
+
+		if(len(queue) > 0):
+			currentProcess = queue[0]
+			left = currentProcess.remainingBurst % currentProcess.burstTime
+			if((currentProcess.numBurst-1) > -1 
+				and currentProcess.remainingBurst >= left):
+				if(cT == 4):
+					if not cTBool:
+						temp = queue.popleft()
+						if len(queue) == 0:
+							print("time {}ms: Process {} started using the CPU {}"
+								.format(count, currentProcess.name, qPrint(queue,'doIt')))
+							queue.appendleft(temp)
+						else:
+							queue.appendleft(temp)
+							print("time {}ms: Process {} started using the CPU {}"
+								.format(count, currentProcess.name, qPrint(queue,currentProcess.name)))
+					if(currentProcess.remainingBurst == 0):
+						cT = -4
+						cTBool = 0
+						processCount = 0
+						if(len(queue) > 1):
+							print("time {}ms: Process {} terminated {}"
+								.format(count, currentProcess.name, qPrint(queue, currentProcess.name)))
+						else:
+							print("time {}ms: Process {} terminated {}"
+								.format(count, currentProcess.name, qPrint(queue, 'doIt')))
+						queue.popleft()
+					elif(processCount > 0 and left == 0):
+						cT = -4
+						cTBool = 0
+						processCount = 0
+						blocked.append(queue.popleft())	
+						currentProcess.numBurst -= 1
+						print("time {}ms: Process {} completed a CPU burst; {} to go {}"
+							.format(count, currentProcess.name, currentProcess.numBurst, qPrint(queue,'')))
+						currentProcess.ioFree = count + currentProcess.ioTime
+						print("time {}ms: Process {} blocked on I/O until time {}ms {}"
+							.format(count, currentProcess.name, currentProcess.ioFree, qPrint(queue,'')))
+					elif(processCount < currentProcess.burstTime):
+						currentProcess.remainingBurst -=1
+						processCount += 1
+						cTBool = 1
+					elif(processCount == currentProcess.burstTime):
+						cT = -4
+						cTBool = 0
+						processCount = 0
+						temp = queue.popleft()
+						if( len(queue) > 0):
+							queue.append(temp)
+							print("time {}ms: Time slice expired; process {} preempted with {}ms to go {}"
+									.format(count, currentProcess.name, left, qPrint(queue,'')))
+						else:
+							print("time {}ms: Time slice expired; no preemption because ready queue is empty {}"
+									.format(count, qPrint(queue,'doIt')))
+							queue.append(temp)
+							cTBool = 1
+							cT = 4
+							processCount = 0
+							continue
+		count+=1
+		if not cTBool:
+			cT += 1
+		for i in blocked:
+			if(count == i.ioFree):
+				temp = i
+				blocked.remove(i)
+				if(len(queue) == 0):
+					cT = 0
+				queue.append(temp)
+				if(len(queue)==1):
+					print("time {}ms: Process {} completed I/O {}"
+					.format(count, i.name, qPrint(queue,'')))
+				else:
+					print("time {}ms: Process {} completed I/O {}"
+						.format(count, i.name, qPrint(queue,currentProcess.name)))
+				break
+		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
+			print("time {}ms: Simulator ended for FCFS".format(count))
+			break
+
+def SJF(fileInput):
+	sort = sortInput(fileInput)
+	formattedDict = sort[0]
+	orderList = sort[1]
+	currentProcess = None
+	queue = deque()
+	blocked = deque()
+	count = 0
+	processCount = 0
+	cT = 0
+	cTBool = 0
+	print("time {}ms: Simulator started for SJF {}".format(count, qPrint(queue,'')))
+
+	while(1):
+		if count in orderList:
+			for i in formattedDict[count]:
+				queue.append(i)
+				if(currentProcess):
+					print("time {}ms: Process {} arrived {}".format(count, i.name, qPrint(queue,currentProcess.name)))
+				else:
+					print("time {}ms: Process {} arrived {}".format(count, i.name, qPrint(queue,'')))
+
+		if(len(queue) > 0):
+			currentProcess = queue[0]
+			left = currentProcess.remainingBurst % currentProcess.burstTime
+			if((currentProcess.numBurst-1) > -1 
+				and currentProcess.remainingBurst >= left):
+				if(cT == 4):
+					if not cTBool:
+						temp = queue.popleft()
+						if len(queue) == 0:
+							print("time {}ms: Process {} started using the CPU {}"
+								.format(count, currentProcess.name, qPrint(queue,'doIt')))
+							queue.appendleft(temp)
+						else:
+							queue.appendleft(temp)
+							print("time {}ms: Process {} started using the CPU {}"
+								.format(count, currentProcess.name, qPrint(queue,currentProcess.name)))
+					if(currentProcess.remainingBurst == 0):
+						cT = -4
+						cTBool = 0
+						processCount = 0
+						if(len(queue) > 1):
+							print("time {}ms: Process {} terminated {}"
+								.format(count, currentProcess.name, qPrint(queue, currentProcess.name)))
+						else:
+							print("time {}ms: Process {} terminated {}"
+								.format(count, currentProcess.name, qPrint(queue, 'doIt')))
+						queue.popleft()
+					elif(processCount > 0 and left == 0):
+						cT = -4
+						cTBool = 0
+						processCount = 0
+						blocked.append(queue.popleft())	
+						currentProcess.numBurst -= 1
+						print("time {}ms: Process {} completed a CPU burst; {} to go {}"
+							.format(count, currentProcess.name, currentProcess.numBurst, qPrint(queue,'')))
+						currentProcess.ioFree = count + currentProcess.ioTime
+						print("time {}ms: Process {} blocked on I/O until time {}ms {}"
+							.format(count, currentProcess.name, currentProcess.ioFree, qPrint(queue,'')))
+					elif(processCount < currentProcess.burstTime):
+						currentProcess.remainingBurst -=1
+						processCount += 1
+						cTBool = 1
+					elif(processCount == currentProcess.burstTime):
+						cT = -4
+						cTBool = 0
+						processCount = 0
+						temp = queue.popleft()
+						if( len(queue) > 0):
+							queue.append(temp)
+							print("time {}ms: Time slice expired; process {} preempted with {}ms to go {}"
+									.format(count, currentProcess.name, left, qPrint(queue,'')))
+						else:
+							print("time {}ms: Time slice expired; no preemption because ready queue is empty {}"
+									.format(count, qPrint(queue,'doIt')))
+							queue.append(temp)
+							cTBool = 1
+							cT = 4
+							processCount = 0
+							continue
+
+		count+=1
+		if not cTBool:
+			cT += 1
+		for i in blocked:
+			if(count == i.ioFree):
+				temp = i
+				blocked.remove(i)
+				if(len(queue) == 0):
+					cT = 0
+				queue.append(temp)
+				if(len(queue)==1):
+					print("time {}ms: Process {} completed I/O {}"
+					.format(count, i.name, qPrint(queue,'')))
+				else:
+					print("time {}ms: Process {} completed I/O {}"
+						.format(count, i.name, qPrint(queue,currentProcess.name)))
+				break
+		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
+			print("time {}ms: Simulator ended for SJF".format(count))
+			break
+
 def RR(fileInput):
 	sort = sortInput(fileInput)
 	formattedDict = sort[0]
@@ -95,11 +300,11 @@ def RR(fileInput):
 						currentProcess.ioFree = count + currentProcess.ioTime
 						print("time {}ms: Process {} blocked on I/O until time {}ms {}"
 							.format(count, currentProcess.name, currentProcess.ioFree, qPrint(queue,'')))
-					elif processCount < currentProcess.burstTime:
+					elif(processCount < 84):
 						currentProcess.remainingBurst -=1
 						processCount += 1
 						cTBool = 1
-					elif(processCount == currentProcess.burstTime):
+					elif(processCount == 84):
 						cT = -4
 						cTBool = 0
 						processCount = 0
@@ -154,6 +359,10 @@ def main(argv):
 			except ValueError:
 				continue
 		formattedInput.append(Process(temp))
+	#FCFS(formattedInput)
+	print('')
+	#sjf(formattedInput)
+	#print('\n')
 	RR(formattedInput)
 
 if __name__ == "__main__":
