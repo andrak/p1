@@ -138,15 +138,20 @@ def FCFS(fileInput):
 			print("time {}ms: Simulator ended for FCFS".format(count))
 			break
 	return
-'''
+
 def sorter(queue):
-	bursts = []
-	sortedQ = []
-	for i in queue:
-		bursts.append(i.burstTime)
-	sortedBursts = sorted(bursts)
-	for i in queue:
-		if'''
+	c = len(queue) - 1
+	while c > 0:
+		if c-1 == 0:
+			break
+		if(queue[c].burstTime < queue[c-1].burstTime):
+			temp = queue[c]
+			queue[c] = queue[c-1]
+			queue[c-1] = temp
+			c -= 1
+		else:
+			break
+	return queue
 
 def SJF(fileInput):
 	sort = sortInput(fileInput)
@@ -165,6 +170,8 @@ def SJF(fileInput):
 		if count in orderList:
 			for i in formattedDict[count]:
 				queue.append(i)
+				temp = sorter(queue)
+				queue = temp
 				if(currentProcess):
 					print("time {}ms: Process {} arrived {}".format(count, i.name, qPrint(queue,currentProcess.name)))
 				else:
@@ -239,7 +246,9 @@ def SJF(fileInput):
 				blocked.remove(i)
 				if(len(queue) == 0):
 					cT = 0
-				queue.append(temp)
+				queue.append(i)
+				temp = sorter(queue)
+				queue = temp
 				if(len(queue)==1):
 					print("time {}ms: Process {} completed I/O {}"
 					.format(count, i.name, qPrint(queue,'')))
@@ -376,8 +385,8 @@ def main(argv):
 	f3 = copy.deepcopy(formattedInput)
 	FCFS(formattedInput)
 	print('')
-	#sjf(formattedInput)
-	#print('\n')
+	SJF(f2)
+	print('')
 	RR(f3)
 
 if __name__ == "__main__":
