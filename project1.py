@@ -135,7 +135,7 @@ def FCFS(fileInput):
 						.format(count, i.name, qPrint(queue,currentProcess.name)))
 				break
 		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
-			print("time {}ms: Simulator ended for FCFS".format(count))
+			print("time {}ms: Simulator ended for FCFS\0".format(count))
 			break
 	return
 
@@ -143,8 +143,15 @@ def sorter(queue):
 	c = len(queue) - 1
 	while c > 0:
 		if c-1 == 0:
-			break
-		if(queue[c].burstTime < queue[c-1].burstTime):
+			if(queue[c].totalBurst == queue[c].remainingBurst and queue[c-1].totalBurst == queue[c-1].remainingBurst):
+				if(queue[c].burstTime < queue[c-1].burstTime):
+					temp = queue[c]
+					queue[c] = queue[c-1]
+					queue[c-1] = temp
+					c -= 1
+			else:
+				break
+		elif(queue[c].burstTime < queue[c-1].burstTime):
 			temp = queue[c]
 			queue[c] = queue[c-1]
 			queue[c-1] = temp
@@ -171,7 +178,7 @@ def SJF(fileInput):
 			for i in formattedDict[count]:
 				queue.append(i)
 				temp = sorter(queue)
-				queue = temp
+				queue = copy.deepcopy(temp)
 				if(currentProcess):
 					print("time {}ms: Process {} arrived {}".format(count, i.name, qPrint(queue,currentProcess.name)))
 				else:
@@ -248,7 +255,7 @@ def SJF(fileInput):
 					cT = 0
 				queue.append(i)
 				temp = sorter(queue)
-				queue = temp
+				queue = copy.deepcopy(temp)
 				if(len(queue)==1):
 					print("time {}ms: Process {} completed I/O {}"
 					.format(count, i.name, qPrint(queue,'')))
@@ -257,7 +264,7 @@ def SJF(fileInput):
 						.format(count, i.name, qPrint(queue,currentProcess.name)))
 				break
 		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
-			print("time {}ms: Simulator ended for SJF".format(count))
+			print("time {}ms: Simulator ended for SJF\0".format(count))
 			break
 	return
 
@@ -361,7 +368,7 @@ def RR(fileInput):
 						.format(count, i.name, qPrint(queue,currentProcess.name)))
 				break
 		if len(queue) == 0 and len(blocked) == 0 and cT == 0:
-			print("time {}ms: Simulator ended for RR".format(count))
+			print("time {}ms: Simulator ended for RR\0".format(count))
 			break
 	return
 
